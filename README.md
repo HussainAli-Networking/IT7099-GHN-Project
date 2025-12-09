@@ -4,14 +4,14 @@ This repository contains all working files, configurations, and documentation us
 
 What This Repository Includes
 
-Router & Switch Configurations
+1. Router & Switch Configurations
 Full show run outputs, backups, and device-specific configuration files used across all GHN sites (Bahrain, England, Luxembourg, China, and ISP).
 
-Project Files
+2. Project Files
 Design documents, diagrams, testing outputs, and implementation notes that support the GHN architecture.
 
-Backup Files
+3. Backup Files
 Copies of key configuration states taken during different testing phases.
 
-System & Server Files
+4. System & Server Files
 Relevant screenshots, Windows Server configs, RADIUS setup notes, and any supporting materials from the virtualization environment (EVE-NG).
