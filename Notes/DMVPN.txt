@@ -1,0 +1,78 @@
+BH-R1:
+
+interface Tunnel1
+ tunnel mode gre multipoint
+ tunnel source s 1/2
+ tunnel key 100
+ ip address 100.100.100.1 255.255.255.248
+ ip nhrp network-id 1
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast dynamic
+ ip nhrp redirect
+
+
+router eigrp DMVPN
+ address-family ipv4 unicast autonomous-system 100
+ eigrp router-id 1.1.16.100
+ network 100.100.100.0 255.255.255.248
+ network 1.1.16.100      255.255.255.255
+af-interface tunnel 1
+no split
+
+
+EN-R1:
+interface Tunnel1
+ ip address 100.100.100.2 255.255.255.248
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast 90.0.0.42
+ ip nhrp map 100.100.100.1 90.0.0.42
+ ip nhrp network-id 1
+ ip nhrp nhs 100.100.100.1
+ ip nhrp shortcut
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 100
+
+router eigrp DMVPN
+ address-family ipv4 unicast autonomous-system 100
+ eigrp router-id 1.1.17.100
+ network 100.100.100.0 255.255.255.248
+ network 1.1.17.100      255.255.255.255
+
+LU-R1:
+interface Tunnel1
+ ip address 100.100.100.3 255.255.255.248
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast 90.0.0.42
+ ip nhrp map 100.100.100.1 90.0.0.42
+ ip nhrp network-id 1
+ ip nhrp nhs 100.100.100.1
+ ip nhrp shortcut
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 100
+
+router eigrp DMVPN
+ address-family ipv4 unicast autonomous-system 100
+ eigrp router-id 1.1.18.100
+ network 100.100.100.0 255.255.255.248
+ network 1.1.18.100      255.255.255.255
+
+CH-R1:
+interface Tunnel1
+ ip address 100.100.100.4 255.255.255.248
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast 90.0.0.42
+ ip nhrp map 100.100.100.1 90.0.0.42
+ ip nhrp network-id 1
+ ip nhrp nhs 100.100.100.1
+ ip nhrp shortcut
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 100
+
+router eigrp DMVPN
+ address-family ipv4 unicast autonomous-system 100
+ eigrp router-id 1.1.19.100
+ network 100.100.100.0 255.255.255.248
+ network 1.1.19.100      255.255.255.255

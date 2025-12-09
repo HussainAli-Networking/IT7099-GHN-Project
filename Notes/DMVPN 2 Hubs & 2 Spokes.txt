@@ -1,0 +1,323 @@
+Hub 1:
+interface Tunnel1
+ ip address 100.100.100.1 255.255.255.240
+ no ip redirects
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast dynamic
+ ip nhrp network-id 1
+ ip nhrp redirect
+ tunnel source Serial1/2
+ tunnel mode gre multipoint
+ tunnel key 100
+
+router eigrp DMVPN
+ !
+ address-family ipv4 unicast autonomous-system 100
+  !
+  af-interface Tunnel1
+   no next-hop-self
+   no split-horizon
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+  network 1.1.16.100 0.0.0.0
+  network 100.100.100.0 0.0.0.15
+  eigrp router-id 1.1.16.100
+ exit-address-family
+
+----------------------------------------------------------
+
+Hub 2:
+interface Tunnel2
+ ip address 100.100.200.1 255.255.255.240
+ no ip redirects
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast dynamic
+ ip nhrp network-id 2
+ ip nhrp redirect
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 200
+
+router eigrp DMVPN
+ !
+ address-family ipv4 unicast autonomous-system 100
+  !
+  af-interface Tunnel2
+   no next-hop-self
+   no split-horizon
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+  network 1.1.16.200 0.0.0.0
+  network 100.100.200.0 0.0.0.15
+  eigrp router-id 1.1.16.200
+ exit-address-family
+
+
+==================================================================
+
+EN-R1:
+
+interface Tunnel1
+ ip address 100.100.100.2 255.255.255.240
+ no ip redirects
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast 90.0.0.42
+ ip nhrp map 100.100.100.1 90.0.0.42
+ ip nhrp network-id 1
+ ip nhrp nhs 100.100.100.1
+ ip nhrp shortcut
+ delay 1000
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 100
+
+interface Tunnel2
+ ip address 100.100.200.2 255.255.255.240
+ no ip redirects
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast 1.1.16.2
+ ip nhrp map 100.100.200.1 1.1.16.2
+ ip nhrp network-id 2
+ ip nhrp nhs 100.100.200.1
+ ip nhrp shortcut
+ delay 5000
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 200
+
+router eigrp DMVPN
+ !
+ address-family ipv4 unicast autonomous-system 100
+  !
+  topology base
+  exit-af-topology
+  network 1.1.17.100 0.0.0.0
+  network 100.100.100.0 0.0.0.15
+  network 100.100.200.0 0.0.0.15
+  eigrp router-id 1.1.17.100
+ exit-address-family
+
+-------------------------------------------------------
+
+EN-R2:
+
+interface Tunnel1
+ ip address 100.100.100.5 255.255.255.240
+ no ip redirects
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast 90.0.0.42
+ ip nhrp map 100.100.100.1 90.0.0.42
+ ip nhrp network-id 1
+ ip nhrp nhs 100.100.100.1
+ ip nhrp shortcut
+ delay 1000
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 100
+
+interface Tunnel2
+ ip address 100.100.200.5 255.255.255.240
+ no ip redirects
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast 1.1.16.2
+ ip nhrp map 100.100.200.1 1.1.16.2
+ ip nhrp network-id 2
+ ip nhrp nhs 100.100.200.1
+ ip nhrp shortcut
+ delay 5000
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 200
+
+router eigrp DMVPN
+ !
+ address-family ipv4 unicast autonomous-system 100
+  !
+  topology base
+  exit-af-topology
+  network 1.1.17.200 0.0.0.0
+  network 100.100.100.0 0.0.0.15
+  network 100.100.200.0 0.0.0.15
+  eigrp router-id 1.1.17.200
+ exit-address-family
+
+-------------------------------------------------------
+
+LU-R1:
+
+interface Tunnel1
+ ip address 100.100.100.3 255.255.255.240
+ no ip redirects
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast 90.0.0.42
+ ip nhrp map 100.100.100.1 90.0.0.42
+ ip nhrp network-id 1
+ ip nhrp nhs 100.100.100.1
+ ip nhrp shortcut
+ delay 1000
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 100
+
+interface Tunnel2
+ ip address 100.100.200.3 255.255.255.240
+ no ip redirects
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast 1.1.16.2
+ ip nhrp map 100.100.200.1 1.1.16.2
+ ip nhrp network-id 2
+ ip nhrp nhs 100.100.200.1
+ ip nhrp shortcut
+ delay 5000
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 200
+
+router eigrp DMVPN
+ !
+ address-family ipv4 unicast autonomous-system 100
+  !
+  topology base
+  exit-af-topology
+  network 1.1.18.100 0.0.0.0
+  network 100.100.100.0 0.0.0.15
+  network 100.100.200.0 0.0.0.15
+  eigrp router-id 1.1.18.100
+ exit-address-family
+
+--------------------------------------------------------------------
+
+LU-R2:
+
+interface Tunnel1
+ ip address 100.100.100.6 255.255.255.240
+ no ip redirects
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast 90.0.0.42
+ ip nhrp map 100.100.100.1 90.0.0.42
+ ip nhrp network-id 1
+ ip nhrp nhs 100.100.100.1
+ ip nhrp shortcut
+ delay 1000
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 100
+
+interface Tunnel2
+ ip address 100.100.200.6 255.255.255.240
+ no ip redirects
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast 1.1.16.2
+ ip nhrp map 100.100.200.1 1.1.16.2
+ ip nhrp network-id 2
+ ip nhrp nhs 100.100.200.1
+ ip nhrp shortcut
+ delay 5000
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 200
+
+router eigrp DMVPN
+ !
+ address-family ipv4 unicast autonomous-system 100
+  !
+  topology base
+  exit-af-topology
+  network 1.1.18.200 0.0.0.0
+  network 100.100.100.0 0.0.0.15
+  network 100.100.200.0 0.0.0.15
+  eigrp router-id 1.1.18.200
+ exit-address-family
+
+----------------------------------------------------------------------
+
+CH-R1:
+
+interface Tunnel1
+ ip address 100.100.100.4 255.255.255.240
+ no ip redirects
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast 90.0.0.42
+ ip nhrp map 100.100.100.1 90.0.0.42
+ ip nhrp network-id 1
+ ip nhrp nhs 100.100.100.1
+ ip nhrp shortcut
+ delay 1000
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 100
+
+interface Tunnel2
+ ip address 100.100.200.4 255.255.255.240
+ no ip redirects
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast 1.1.16.2
+ ip nhrp map 100.100.200.1 1.1.16.2
+ ip nhrp network-id 2
+ ip nhrp nhs 100.100.200.1
+ ip nhrp shortcut
+ delay 5000
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 200
+
+router eigrp DMVPN
+ !
+ address-family ipv4 unicast autonomous-system 100
+  !
+  topology base
+  exit-af-topology
+  network 1.1.19.100 0.0.0.0
+  network 100.100.100.0 0.0.0.15
+  network 100.100.200.0 0.0.0.15
+  eigrp router-id 1.1.19.100
+ exit-address-family
+
+
+------------------------------------------------------------------------
+
+CH-R2:
+
+interface Tunnel1
+ ip address 100.100.100.7 255.255.255.240
+ no ip redirects
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast 90.0.0.42
+ ip nhrp map 100.100.100.1 90.0.0.42
+ ip nhrp network-id 1
+ ip nhrp nhs 100.100.100.1
+ ip nhrp shortcut
+ delay 1000
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 100
+
+interface Tunnel2
+ ip address 100.100.200.7 255.255.255.240
+ no ip redirects
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast 1.1.16.2
+ ip nhrp map 100.100.200.1 1.1.16.2
+ ip nhrp network-id 2
+ ip nhrp nhs 100.100.200.1
+ ip nhrp shortcut
+ delay 5000
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 200
+
+router eigrp DMVPN
+ !
+ address-family ipv4 unicast autonomous-system 100
+  !
+  topology base
+  exit-af-topology
+  network 1.1.19.200 0.0.0.0
+  network 100.100.100.0 0.0.0.15
+  network 100.100.200.0 0.0.0.15
+  eigrp router-id 1.1.19.200
+ exit-address-family

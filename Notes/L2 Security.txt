@@ -1,0 +1,142 @@
+=========================
+L2 SECURITY CONFIGURATION
+=========================
+
+1. SSH CONFIGURATION
+--------------------
+Purpose: Secures management access with encryption and local authentication.
+
+ip domain-name <DOMAIN_NAME>
+username <USERNAME> privilege 15 algorithm-type scrypt secret <DEVICE_NAME>@ssh
+crypto key generate rsa general-keys modulus 1024
+ip ssh version 2
+ip ssh time-out 90
+ip ssh authentication-retries 5
+
+line vty 0 4
+ privilege level 15
+ exec-timeout 7 0
+ login local
+ transport input ssh
+exit
+
+line console 0
+ login local
+ exec-timeout 5 0
+ logging synchronous
+
+line aux 0
+ login local
+ exec-timeout 5 0
+
+
+2. SPANNING TREE CONFIGURATION
+------------------------------
+Purpose: Ensures network stability, prevents loops, and controls which switch is root.
+
+Root Switch:
+spanning-tree vlan <VLAN_NUMBER> root primary
+spanning-tree vlan <VLAN_NUMBER> root secondary
+
+Global Settings:
+spanning-tree portfast default
+spanning-tree portfast bpduguard default
+
+Non-Root Switch:
+spanning-tree loopguard default
+
+Root Switch (on ports facing other switches only):
+spanning-tree guard root
+
+Note:
+Use Root Guard only on non-root switches (on ports connecting toward the root or backup root).
+Do NOT enable Root Guard on the root or backup root switches themselves.
+
+
+3. SWITCHPORT CONFIGURATION
+---------------------------
+Purpose: Controls how devices connect and limits unauthorized access.
+
+For trunk ports:
+switchport nonegotiate
+
+For access ports:
+switchport mode access
+switchport port-security
+switchport port-security mac-address sticky
+switchport port-security maximum 5
+switchport port-security violation shutdown
+switchport port-security aging time 120
+
+
+4. DHCP SNOOPING
+----------------
+Purpose: Prevents rogue DHCP servers from giving fake IP addresses to clients.
+
+Enable globally:
+ip dhcp snooping
+ip dhcp snooping information option
+ip dhcp snooping vlan <VLAN_NUMBER>
+
+Limit DHCP requests per interface:
+ip dhcp snooping limit rate 10
+
+Mark trusted interfaces (DHCP replies allowed only through trusted ports):
+ip dhcp snooping trust
+
+
+5. DYNAMIC ARP INSPECTION (DAI)
+-------------------------------
+Purpose: Stops ARP spoofing and man-in-the-middle attacks.
+
+Enable globally (requires DHCP Snooping):
+ip arp inspection vlan <VLAN_NUMBER>
+ip arp inspection validate src-mac dst-mac ip
+ip arp inspection limit rate 15
+
+Mark trusted interfaces (uplinks or DHCP server links):
+interface <INTERFACE>
+ ip arp inspection trust
+
+
+6. BPDU FILTERING
+-----------------
+Purpose: Prevents access ports from sending or receiving BPDUs.
+
+Enable globally (optional):
+spanning-tree portfast bpdufilter default
+
+
+7. VLAN HOPPING PREVENTION
+--------------------------
+Purpose: Blocks attackers from gaining access to other VLANs.
+
+Disable DTP negotiation on all trunk and access ports:
+switchport nonegotiate
+
+Avoid using VLAN 1 for user traffic; reserve VLAN 1 for management only.
+
+
+8. UNUSED PORT SECURITY
+-----------------------
+Purpose: Protects the switch from unauthorized physical connections.
+
+Shutdown all unused ports and move them to an isolated VLAN:
+interface range e0/10 - 24
+ switchport mode access
+ switchport access vlan 999
+ shutdown
+ description *** UNUSED PORT ***
+
+
+9. BEST PRACTICES
+-----------------
+Purpose: Summarizes key security recommendations for Layer 2.
+
+- Always use SSH instead of Telnet for secure access.
+- Apply port security on all access ports to prevent unauthorized connections.
+- Enable BPDU Guard, Loop Guard, and PortFast to protect spanning-tree stability.
+- Use Root Guard only on non-root switches to prevent rogue root elections.
+- Limit DHCP traffic to prevent starvation and spoofing attacks.
+- Enable Dynamic ARP Inspection (DAI) to stop ARP spoofing.
+- Disable DTP on all ports and keep unused ports shut down.

@@ -1,0 +1,293 @@
+! ==============================
+! IKE Phase 1
+! ==============================
+crypto isakmp policy 10
+ encr aes 256
+ hash sha256
+ authentication pre-share
+ group 14
+ lifetime 3600
+
+! ==============================
+! IPsec Phase 2
+! ==============================
+crypto ipsec transform-set DMVPN-SET esp-aes 256 esp-sha-hmac
+ mode transport
+
+crypto ipsec profile DMVPN-PROFILE
+ set transform-set DMVPN-SET
+
+option 1: Use 0.0.0.0 0.0.0.0 on all routers (hub + spokes).
+crypto isakmp key GHNDMVPN address 0.0.0.0 0.0.0.0
+
+
+interface Tunnel1
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+
+interface Tunnel2
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+
+ option 2: strict matching
+in hub
+crypto isakmp key GHNDMVPN address <Spoke1 NBMA>
+crypto isakmp key GHNDMVPN address <Spoke2 NBMA>
+crypto isakmp key GHNDMVPN address <Spoke3 NBMA>
+crypto isakmp key GHNDMVPN address <Spoke4 NBMA>
+crypto isakmp key GHNDMVPN address <Spoke5 NBMA>
+
+in spoke
+crypto isakmp key GHNDMVPN address 90.0.0.42   (Hub1 NBMA)
+crypto isakmp key GHNDMVPN address 1.1.16.2    (Hub2 NBMA)
+crypto isakmp key GHNDMVPN address <Spoke1 NBMA>
+crypto isakmp key GHNDMVPN address <Spoke2 NBMA>
+crypto isakmp key GHNDMVPN address <Spoke3 NBMA>
+crypto isakmp key GHNDMVPN address <Spoke4 NBMA>
+crypto isakmp key GHNDMVPN address <Spoke5 NBMA>
+--------------------------------------------------------------------
+
+Hub 1:
+
+crypto isakmp policy 10
+ encr aes 256
+ hash sha256
+ authentication pre-share
+ group 14
+ lifetime 3600
+
+crypto ipsec transform-set DMVPN-SET esp-aes 256 esp-sha-hmac
+ mode transport
+
+crypto ipsec profile DMVPN-PROFILE
+ set transform-set DMVPN-SET 
+
+
+crypto isakmp key GHNDMVPN address 1.1.17.1
+crypto isakmp key GHNDMVPN address 1.1.17.2
+crypto isakmp key GHNDMVPN address 1.1.18.1
+crypto isakmp key GHNDMVPN address 1.1.18.2
+crypto isakmp key GHNDMVPN address 1.1.19.1
+crypto isakmp key GHNDMVPN address 1.1.19.2
+
+interface Tunnel1
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+
+-----------------------------------------------------------------------
+
+Hub 2:
+
+crypto isakmp policy 10
+ encr aes 256
+ hash sha256
+ authentication pre-share
+ group 14
+ lifetime 3600
+
+crypto ipsec transform-set DMVPN-SET esp-aes 256 esp-sha-hmac
+ mode transport
+
+crypto ipsec profile DMVPN-PROFILE
+ set transform-set DMVPN-SET
+
+
+crypto isakmp key GHNDMVPN address 1.1.17.1
+crypto isakmp key GHNDMVPN address 1.1.17.2
+crypto isakmp key GHNDMVPN address 1.1.18.1
+crypto isakmp key GHNDMVPN address 1.1.18.2
+crypto isakmp key GHNDMVPN address 1.1.19.1
+crypto isakmp key GHNDMVPN address 1.1.19.2
+
+interface Tunnel2
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+
+-------------------------------------------------------------------------
+
+EN-R1:
+
+crypto isakmp policy 10
+ encr aes 256
+ hash sha256
+ authentication pre-share
+ group 14
+ lifetime 3600
+
+crypto ipsec transform-set DMVPN-SET esp-aes 256 esp-sha-hmac
+ mode transport
+
+crypto ipsec profile DMVPN-PROFILE
+ set transform-set DMVPN-SET
+
+interface Tunnel1
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+
+interface Tunnel2
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+
+
+crypto isakmp key GHNDMVPN address 90.0.0.42 
+crypto isakmp key GHNDMVPN address 1.1.16.2
+crypto isakmp key GHNDMVPN address 1.1.17.2
+crypto isakmp key GHNDMVPN address 1.1.18.1
+crypto isakmp key GHNDMVPN address 1.1.18.2
+crypto isakmp key GHNDMVPN address 1.1.19.1
+crypto isakmp key GHNDMVPN address 1.1.19.2
+  
+
+--------------------------------------------------------------------------
+
+EN-R2:
+
+crypto isakmp policy 10
+ encr aes 256
+ hash sha256
+ authentication pre-share
+ group 14
+ lifetime 3600
+
+crypto ipsec transform-set DMVPN-SET esp-aes 256 esp-sha-hmac
+ mode transport
+
+crypto ipsec profile DMVPN-PROFILE
+ set transform-set DMVPN-SET
+
+interface Tunnel1
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+
+interface Tunnel2
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+
+
+crypto isakmp key GHNDMVPN address 90.0.0.42 
+crypto isakmp key GHNDMVPN address 1.1.16.2
+crypto isakmp key GHNDMVPN address 1.1.17.1
+crypto isakmp key GHNDMVPN address 1.1.18.1
+crypto isakmp key GHNDMVPN address 1.1.18.2
+crypto isakmp key GHNDMVPN address 1.1.19.1
+crypto isakmp key GHNDMVPN address 1.1.19.2  
+
+---------------------------------------------------------------------------
+
+LU-R1:
+
+crypto isakmp policy 10
+ encr aes 256
+ hash sha256
+ authentication pre-share
+ group 14
+ lifetime 3600
+
+crypto ipsec transform-set DMVPN-SET esp-aes 256 esp-sha-hmac
+ mode transport
+
+crypto ipsec profile DMVPN-PROFILE
+ set transform-set DMVPN-SET
+
+interface Tunnel1
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+
+interface Tunnel2
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+
+
+crypto isakmp key GHNDMVPN address 90.0.0.42 
+crypto isakmp key GHNDMVPN address 1.1.16.2
+crypto isakmp key GHNDMVPN address 1.1.17.1
+crypto isakmp key GHNDMVPN address 1.1.17.2
+crypto isakmp key GHNDMVPN address 1.1.18.2
+crypto isakmp key GHNDMVPN address 1.1.19.1
+crypto isakmp key GHNDMVPN address 1.1.19.2  
+
+---------------------------------------------------------------------------
+
+LU-R2:
+
+crypto isakmp policy 10
+ encr aes 256
+ hash sha256
+ authentication pre-share
+ group 14
+ lifetime 3600
+
+crypto ipsec transform-set DMVPN-SET esp-aes 256 esp-sha-hmac
+ mode transport
+
+crypto ipsec profile DMVPN-PROFILE
+ set transform-set DMVPN-SET
+
+interface Tunnel1
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+
+interface Tunnel2
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+
+
+crypto isakmp key GHNDMVPN address 90.0.0.42 
+crypto isakmp key GHNDMVPN address 1.1.16.2
+crypto isakmp key GHNDMVPN address 1.1.17.1
+crypto isakmp key GHNDMVPN address 1.1.17.2
+crypto isakmp key GHNDMVPN address 1.1.18.1
+crypto isakmp key GHNDMVPN address 1.1.19.1
+crypto isakmp key GHNDMVPN address 1.1.19.2  
+
+---------------------------------------------------------------------------
+
+CH-R1:
+
+crypto isakmp policy 10
+ encr aes 256
+ hash sha256
+ authentication pre-share
+ group 14
+ lifetime 3600
+
+crypto ipsec transform-set DMVPN-SET esp-aes 256 esp-sha-hmac
+ mode transport
+
+crypto ipsec profile DMVPN-PROFILE
+ set transform-set DMVPN-SET
+
+interface Tunnel1
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+
+interface Tunnel2
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+
+
+crypto isakmp key GHNDMVPN address 90.0.0.42 
+crypto isakmp key GHNDMVPN address 1.1.16.2
+crypto isakmp key GHNDMVPN address 1.1.17.1
+crypto isakmp key GHNDMVPN address 1.1.17.2
+crypto isakmp key GHNDMVPN address 1.1.18.1
+crypto isakmp key GHNDMVPN address 1.1.18.2
+crypto isakmp key GHNDMVPN address 1.1.19.2  
+
+----------------------------------------------------------------------------
+
+CH-R2:
+
+crypto isakmp policy 10
+ encr aes 256
+ hash sha256
+ authentication pre-share
+ group 14
+ lifetime 3600
+
+crypto ipsec transform-set DMVPN-SET esp-aes 256 esp-sha-hmac
+ mode transport
+
+crypto ipsec profile DMVPN-PROFILE
+ set transform-set DMVPN-SET
+
+interface Tunnel1
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+
+interface Tunnel2
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+
+
+crypto isakmp key GHNDMVPN address 90.0.0.42 
+crypto isakmp key GHNDMVPN address 1.1.16.2 
+crypto isakmp key GHNDMVPN address 1.1.17.1
+crypto isakmp key GHNDMVPN address 1.1.17.2
+crypto isakmp key GHNDMVPN address 1.1.18.1
+crypto isakmp key GHNDMVPN address 1.1.18.2
+crypto isakmp key GHNDMVPN address 1.1.19.1
