@@ -1,0 +1,162 @@
+hostname EN-R2
+no ip domain lookup
+banner motd ^C
+***********************************************************************
+*                                                                     *
+*  SECURITY WARNING: Global Health Network (GHN) ROUTER             *
+*                                                                     *
+*  NOTICE: This Router is restricted to authorized personnel only.    *
+*  Unauthorized access is strictly prohibited and may lead to         *
+*  disciplinary action or legal prosecution.                          *
+*                                                                     *
+*  This device is monitored to ensure network security and            *
+*  compliance with GHN policies. All activity is logged in real-time. *
+*                                                                     *
+*  If you are not authorized, disconnect immediately.                 * 
+*                                                                     *
+***********************************************************************
+^C
+int loopback 0
+ip add 1.1.17.2 255.255.255.255
+ no shutdown
+
+interface Loopback1
+ ip address 1.1.17.200 255.255.255.255
+no shutdown
+
+interface Tunnel1
+ ip address 100.100.100.5 255.255.255.240
+ no ip redirects
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast 90.0.0.42
+ ip nhrp map 100.100.100.1 90.0.0.42
+ ip nhrp network-id 1
+ ip nhrp nhs 100.100.100.1
+ ip nhrp shortcut
+ delay 1000
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 100
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+
+interface Tunnel2
+ ip address 100.100.200.5 255.255.255.240
+ no ip redirects
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast 1.1.16.2
+ ip nhrp map 100.100.200.1 1.1.16.2
+ ip nhrp network-id 2
+ ip nhrp nhs 100.100.200.1
+ ip nhrp shortcut
+ delay 5000
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 200
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+
+int s1/0
+ ip address 172.20.1.18 255.255.255.252
+ip ospf authentication key-chain englandOSPF
+ no shutdown
+
+int s1/1
+ ip address 172.20.1.25 255.255.255.252
+ip ospf authentication key-chain englandOSPF
+ no shutdown
+
+int s1/2
+ ip address 90.0.0.46 255.255.255.252
+ no shutdown
+
+key chain englandOSPF
+key 17
+key-string england@ospf
+cryptographic-algorithm hmac-sha-256
+exit
+exit
+
+router ospf 170
+router-id 1.1.17.2
+network 1.1.17.2      0.0.0.0 area 0
+network 172.20.1.16   0.0.0.3 area 0
+network 172.20.1.24   0.0.0.3 area 0
+network 90.0.0.52     0.0.0.3 area 0
+  passive-interface default
+  no passive-interface Serial1/0
+  no passive-interface Serial1/1
+  no passive-interface Serial1/2
+  no passive-interface Loopback0
+exit
+
+router bgp 170
+bgp router-id 1.1.17.2
+no bgp default ipv4-unicast
+neighbor 90.0.0.45 remote-as 1000
+
+address-family ipv4 unicast
+network 1.1.17.2 mask 255.255.255.255
+neighbor 90.0.0.45 activate
+
+router eigrp DMVPN
+ !
+ address-family ipv4 unicast autonomous-system 100
+  !
+  topology base
+   redistribute static metric 100000 10 255 1 1500
+  exit-af-topology
+  network 1.1.17.200 0.0.0.0
+  network 100.100.100.0 0.0.0.15
+  network 100.100.200.0 0.0.0.15
+  eigrp router-id 1.1.17.200
+ exit-address-family
+
+
+ip domain-name GHN.com
+username EN-R2 privilege 15 algorithm-type scrypt secret enr2@ssh
+
+service password-encryption
+
+crypto key generate rsa modulus 1024
+
+ip ssh version 2
+ip ssh time-out 90
+ip ssh authentication-retries 5
+
+ line vty 0 4
+privilege level 15
+exec-timeout 7 0
+login local
+transport input ssh
+exit
+
+ line console 0
+ exec-timeout 5 0
+ logging synchronous
+
+ line aux 0
+ login local
+ exec-timeout 5 0
+
+crypto isakmp policy 10
+ encr aes 256
+ hash sha256
+ authentication pre-share
+ group 14
+ lifetime 3600
+crypto isakmp key GHNDMVPN address 90.0.0.42
+crypto isakmp key GHNDMVPN address 1.1.16.2
+crypto isakmp key GHNDMVPN address 1.1.18.1
+crypto isakmp key GHNDMVPN address 1.1.18.2
+crypto isakmp key GHNDMVPN address 1.1.19.1
+crypto isakmp key GHNDMVPN address 1.1.19.2
+crypto isakmp key GHNDMVPN address 1.1.17.1
+!
+!
+crypto ipsec transform-set DMVPN-SET esp-aes 256 esp-sha-hmac
+ mode transport
+!
+crypto ipsec profile DMVPN-PROFILE
+ set transform-set DMVPN-SET
+
+ip route 172.17.0.0 255.255.0.0 Null0
+

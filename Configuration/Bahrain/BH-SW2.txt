@@ -1,0 +1,105 @@
+hostname BH-SW2
+no ip domain lookup
+banner motd ^C
+***********************************************************************
+*                                                                     *
+*  SECURITY WARNING: Global Health Network (GHN) SWITCH             *
+*                                                                     *
+*  NOTICE: This Switch is restricted to authorized personnel only.    *
+*  Unauthorized access is strictly prohibited and may lead to         *
+*  disciplinary action or legal prosecution.                          *
+*                                                                     *
+*  This device is monitored to ensure network security and            *
+*  compliance with PSS policies. All activity is logged in real-time. *
+*                                                                     *
+*  If you are not authorized, disconnect immediately.                 * 
+*                                                                     *
+***********************************************************************
+^C
+
+ip domain-name GHN.com
+username BH-SW2 privilege 15 algorithm-type scrypt secret bhsw2@ssh
+
+interface Ethernet0/0
+duplex full
+switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk native vlan 100
+switchport nonegotiate
+no shut
+
+interface Ethernet0/1
+duplex full
+switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk native vlan 100
+switchport nonegotiate
+no shut
+
+interface Ethernet0/2
+duplex full
+switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk native vlan 100
+switchport nonegotiate
+no shut
+
+interface Ethernet0/3
+ description UNUSED PORT
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+
+interface Ethernet1/0
+duplex full
+switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk native vlan 100
+switchport nonegotiate
+no shut
+
+interface Ethernet1/1
+ switchport mode access
+ switchport access vlan 30
+switchport port-security
+switchport port-security mac-address sticky
+switchport port-security maximum 5
+switchport port-security violation shutdown
+switchport port-security aging time 120
+no shut
+
+interface Ethernet1/2
+ description UNUSED PORT
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+
+interface Ethernet1/3
+ description UNUSED PORT
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+
+interface vlan 100 
+ip add 172.16.100.102 255.255.255.0
+no shut
+
+ip default-gateway 172.16.100.254
+
+vtp mode client
+vtp domain Bahrain
+vtp password bahrain@vtp
+
+service password-encryption
+
+crypto key generate rsa modulus 1024
+
+ip ssh version 2
+ip ssh time-out 90
+ip ssh authentication-retries 5
+
+spanning-tree loopguard default
+spanning-tree portfast bpdufilter default
+spanning-tree portfast default
+spanning-tree portfast bpduguard default
+

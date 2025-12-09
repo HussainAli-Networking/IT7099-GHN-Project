@@ -1,0 +1,115 @@
+hostname EN-R3
+no ip domain lookup
+banner motd ^C
+***********************************************************************
+*                                                                     *
+*  SECURITY WARNING: Global Health Network (GHN) ROUTER             *
+*                                                                     *
+*  NOTICE: This Router is restricted to authorized personnel only.    *
+*  Unauthorized access is strictly prohibited and may lead to         *
+*  disciplinary action or legal prosecution.                          *
+*                                                                     *
+*  This device is monitored to ensure network security and            *
+*  compliance with GHN policies. All activity is logged in real-time. *
+*                                                                     *
+*  If you are not authorized, disconnect immediately.                 * 
+*                                                                     *
+***********************************************************************
+^C
+int loopback 0
+ip add 1.1.17.3 255.255.255.255
+ip ospf authentication key-chain englandOSPF
+ no shutdown
+
+int s1/1
+ ip address 172.20.1.26 255.255.255.252
+ ip ospf authentication key-chain englandOSPF
+ no shutdown
+
+int s1/2
+ ip address 172.20.1.22 255.255.255.252
+ ip ospf authentication key-chain englandOSPF
+ no shutdown
+
+int E0/2
+no shutdown
+
+int E0/2.10
+encapsulation dot1Q 10
+ ip address 172.17.10.1 255.255.255.0
+ standby version 2
+ standby 10 ip 172.17.10.254
+ no shutdown
+
+int E0/2.20
+encapsulation dot1Q 20
+ ip address 172.17.20.1 255.255.255.0
+ standby version 2
+ standby 20 ip 172.17.20.254
+ no shutdown
+
+int E0/2.30
+encapsulation dot1Q 30
+ ip address 172.17.30.1 255.255.255.0
+ standby version 2
+ standby 30 ip 172.17.30.254
+ no shutdown
+
+int E0/2.100
+encapsulation dot1Q 100 native
+ ip address 172.17.100.1 255.255.255.0
+ standby version 2
+ standby 100 ip 172.17.100.254
+ no shutdown
+
+key chain englandOSPF
+key 17
+key-string england@ospf
+cryptographic-algorithm hmac-sha-256
+exit
+exit
+
+router ospf 170
+router-id 1.1.17.3
+network 1.1.17.3        0.0.0.0 area 0
+network 172.20.1.20     0.0.0.3 area 0
+network 172.20.1.24     0.0.0.3 area 0
+network 172.17.10.0     0.0.0.255 area 0
+network 172.17.20.0     0.0.0.255 area 0
+network 172.17.30.0     0.0.0.255 area 0
+network 172.17.100.0    0.0.0.255 area 0
+  passive-interface default
+  no passive-interface Serial1/1
+  no passive-interface Serial1/2
+  no passive-interface E0/2.10
+  no passive-interface E0/2.20
+  no passive-interface E0/2.30
+  no passive-interface E0/2.100
+  no passive-interface Loopback0
+exit
+
+ip domain-name GHN.com
+username EN-R3 privilege 15 algorithm-type scrypt secret enr3@ssh
+
+service password-encryption
+
+crypto key generate rsa modulus 1024
+
+ip ssh version 2
+ip ssh time-out 90
+ip ssh authentication-retries 5
+
+ line vty 0 4
+privilege level 15
+exec-timeout 7 0
+login local
+transport input ssh
+exit
+
+ line console 0
+ exec-timeout 5 0
+ logging synchronous
+
+ line aux 0
+ login local
+ exec-timeout 5 0

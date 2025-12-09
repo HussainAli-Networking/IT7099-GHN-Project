@@ -1,0 +1,115 @@
+hostname BH-SW3
+no ip domain lookup
+banner motd ^C
+***********************************************************************
+*                                                                     *
+*  SECURITY WARNING: Global Health Network (GHN) SWITCH             *
+*                                                                     *
+*  NOTICE: This Switch is restricted to authorized personnel only.    *
+*  Unauthorized access is strictly prohibited and may lead to         *
+*  disciplinary action or legal prosecution.                          *
+*                                                                     *
+*  This device is monitored to ensure network security and            *
+*  compliance with PSS policies. All activity is logged in real-time. *
+*                                                                     *
+*  If you are not authorized, disconnect immediately.                 * 
+*                                                                     *
+***********************************************************************
+^C
+
+ip domain-name GHN.com
+username BH-SW3 privilege 15 algorithm-type scrypt secret bhsw3@ssh
+
+interface Ethernet0/0
+ description UNUSED PORT
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+
+interface Ethernet0/1
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 100
+ switchport mode trunk
+ switchport nonegotiate
+ duplex full
+ spanning-tree guard root
+no shut
+
+interface Ethernet0/2
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 100
+ switchport mode trunk
+ switchport nonegotiate
+ duplex full
+no shut
+
+interface Ethernet0/3
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 100
+ switchport mode trunk
+ switchport nonegotiate
+ duplex full
+ spanning-tree guard root
+no shut
+
+interface Ethernet1/0
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 100
+ switchport mode trunk
+ switchport nonegotiate
+ duplex full
+ spanning-tree guard root
+no shut
+
+interface Ethernet1/1
+ description UNUSED PORT
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+
+interface Ethernet1/2
+ description UNUSED PORT
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+
+interface Ethernet1/3
+ description UNUSED PORT
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+
+interface vlan 100 
+ip add 172.16.100.103 255.255.255.0
+no shut
+
+ip default-gateway 172.16.100.254
+
+vtp mode client
+vtp domain Bahrain
+vtp password bahrain@vtp
+
+service password-encryption
+
+spanning-tree vlan 1,100 root primary
+
+crypto key generate rsa modulus 1024
+
+ip ssh version 2
+ip ssh time-out 90
+ip ssh authentication-retries 5
+
+line vty 0 4
+privilege level 15
+exec-timeout 7 0
+login local
+transport input ssh
+exit
+
+ line console 0
+ exec-timeout 5 0
+ logging synchronous
+
+ line aux 0
+ login local
+ exec-timeout 5 0

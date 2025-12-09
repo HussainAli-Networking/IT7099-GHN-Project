@@ -1,0 +1,144 @@
+hostname BH-R4
+no ip domain lookup
+banner motd ^C
+***********************************************************************
+*                                                                     *
+*  SECURITY WARNING: Global Health Network (GHN) ROUTER             *
+*                                                                     *
+*  NOTICE: This Router is restricted to authorized personnel only.    *
+*  Unauthorized access is strictly prohibited and may lead to         *
+*  disciplinary action or legal prosecution.                          *
+*                                                                     *
+*  This device is monitored to ensure network security and            *
+*  compliance with PSS policies. All activity is logged in real-time. *
+*                                                                     *
+*  If you are not authorized, disconnect immediately.                 * 
+*                                                                     *
+***********************************************************************
+^C
+int loopback 0
+ip address 1.1.16.4 255.255.255.255
+ no shutdown
+
+int s1/0
+ ip address 172.20.1.14 255.255.255.252
+ no shutdown
+
+int s1/1
+ ip address 172.20.1.10 255.255.255.252
+ no shutdown
+
+int e0/1
+no shutdown
+
+int e0/1.10
+encapsulation dot1Q 10
+ip add 172.16.10.2 255.255.255.0
+ standby version 2
+ standby 10 ip 172.16.10.254
+ no shutdown
+
+int e0/1.20
+encapsulation dot1Q 20
+ip add 172.16.20.2 255.255.255.0 
+standby version 2
+ standby 20 ip 172.16.20.254
+ no shutdown
+
+int e0/1.30
+encapsulation dot1Q 30
+ip add 172.16.30.2 255.255.255.0
+ standby version 2
+ standby 30 ip 172.16.30.254
+ no shutdown
+
+int e0/1.100
+encapsulation dot1Q 100 native
+ip add 172.16.100.2 255.255.255.0
+ standby version 2
+ standby 100 ip 172.16.100.254
+ no shutdown
+
+key chain BHEIGRP
+key 16
+key-string bahrain@eigrp
+cryptographic-algorithm hmac-sha-256
+exit
+exit
+
+router EIGRP BH-EIGRP
+ address-family ipv4 unicast autonomous-system 160
+eigrp router-id 1.1.16.4
+network 1.1.16.4      255.255.255.255
+network 172.20.1.12   255.255.255.252
+network 172.20.1.8    255.255.255.252
+network 172.16.10.0   255.255.255.0
+network 172.16.20.0   255.255.255.0
+network 172.16.30.0   255.255.255.0
+network 172.16.100.0  255.255.255.0
+
+af-interface default
+passive-interface
+authentication mode hmac-sha-256 7 bahrain@eigrp
+authentication key-chain BHEIGRP
+exit-af-interface
+
+af-interface s1/0
+no passive-interface
+exit-af-interface
+
+af-interface s1/1
+no passive-interface
+exit-af-interface
+
+af-interface e0/1.10
+no passive-interface
+no authentication mode  
+no authentication key-chain 
+exit-af-interface
+
+af-interface e0/1.20
+no passive-interface
+no authentication mode  
+no authentication key-chain 
+exit-af-interface
+
+af-interface e0/1.30
+no passive-interface
+no authentication mode  
+no authentication key-chain 
+exit-af-interface
+
+af-interface e0/1.100
+no passive-interface
+no authentication mode  
+no authentication key-chain 
+exit-af-interface
+
+service password-encryption
+
+ip domain-name GHN.com
+username BH-R4 privilege 15 algorithm-type scrypt secret bhr4@ssh
+
+crypto key generate rsa modulus 1024
+
+ip ssh version 2
+ip ssh time-out 90
+ip ssh authentication-retries 5
+
+ line vty 0 4
+privilege level 15
+exec-timeout 7 0
+login local
+transport input ssh
+exit
+
+ line console 0
+ exec-timeout 5 0
+ logging synchronous
+
+ line aux 0
+ login local
+ exec-timeout 5 0
+
+ip route 0.0.0.0 0.0.0.0 172.20.1.9

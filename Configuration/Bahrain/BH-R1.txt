@@ -1,0 +1,159 @@
+hostname BH-R1
+no ip domain lookup
+banner motd ^C
+***********************************************************************
+*                                                                     *
+*  SECURITY WARNING: Global Health Network (GHN) ROUTER             *
+*                                                                     *
+*  NOTICE: This Router is restricted to authorized personnel only.    *
+*  Unauthorized access is strictly prohibited and may lead to         *
+*  disciplinary action or legal prosecution.                          *
+*                                                                     *
+*  This device is monitored to ensure network security and            *
+*  compliance with PSS policies. All activity is logged in real-time. *
+*                                                                     *
+*  If you are not authorized, disconnect immediately.                 * 
+*                                                                     *
+***********************************************************************
+^C
+int loopback 0
+ip add 1.1.16.1 255.255.255.255
+ no shutdown
+
+int loopback 1
+ip add 1.1.16.100 255.255.255.255
+ no shutdown
+
+interface Tunnel1
+ ip address 100.100.100.1 255.255.255.240
+ no ip redirects
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast dynamic
+ ip nhrp network-id 1
+ ip nhrp redirect
+ tunnel source Serial1/2
+ tunnel mode gre multipoint
+ tunnel key 100
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+
+int s1/0
+ ip address 172.20.1.1 255.255.255.252
+ no shutdown
+
+int s1/1
+ ip address 172.20.1.5 255.255.255.252
+ no shutdown
+
+int s1/2
+ ip address 90.0.0.42 255.255.255.252
+ no shutdown
+
+key chain BHEIGRP
+key 16
+key-string bahrain@eigrp
+cryptographic-algorithm hmac-sha-256
+exit
+exit
+
+router EIGRP BH-EIGRP
+ address-family ipv4 unicast autonomous-system 160
+eigrp router-id 1.1.16.1
+network 1.1.16.1    255.255.255.255
+network 172.20.1.0  255.255.255.252
+network 172.20.1.4  255.255.255.252
+network 90.0.0.48   255.255.255.252
+
+af-interface default
+passive-interface
+authentication mode hmac-sha-256 7 bahrain@eigrp
+authentication key-chain BHEIGRP
+exit-af-interface
+
+af-interface s1/0
+no passive-interface
+exit-af-interface
+
+af-interface s1/1
+no passive-interface
+exit-af-interface
+
+af-interface s1/2
+no passive-interface
+no authentication mode  
+no authentication key-chain 
+exit-af-interface
+
+router bgp 160
+no bgp default ipv4-unicast
+bgp router-id 1.1.16.1
+neighbor 90.0.0.41 remote-as 1000
+
+address-family ipv4 unicast
+neighbor 90.0.0.41 activate
+ network 1.1.16.1 mask 255.255.255.255
+
+router eigrp DMVPN
+ !
+ address-family ipv4 unicast autonomous-system 100
+  !
+  af-interface Tunnel1
+   no next-hop-self
+   no split-horizon
+  exit-af-interface
+  !
+  topology base
+   redistribute static metric 100000 10 255 1 1500
+  exit-af-topology
+  network 1.1.16.100 0.0.0.0
+  network 100.100.100.0 0.0.0.15
+  eigrp router-id 1.1.16.100
+ exit-address-family
+
+service password-encryption
+
+ip domain-name GHN.com
+username BH-R1 privilege 15 algorithm-type scrypt secret bhr1@ssh
+
+crypto key generate rsa modulus 1024
+
+ip ssh version 2
+ip ssh time-out 90
+ip ssh authentication-retries 5
+
+ line vty 0 4
+privilege level 15
+exec-timeout 7 0
+login local
+transport input ssh
+exit
+
+ line console 0
+ exec-timeout 5 0
+ logging synchronous
+
+ line aux 0
+ login local
+ exec-timeout 5 0
+
+crypto isakmp policy 10
+ encr aes 256
+ hash sha256
+ authentication pre-share
+ group 14
+ lifetime 3600
+crypto isakmp key GHNDMVPN address 1.1.17.1
+crypto isakmp key GHNDMVPN address 1.1.17.2
+crypto isakmp key GHNDMVPN address 1.1.18.1
+crypto isakmp key GHNDMVPN address 1.1.18.2
+crypto isakmp key GHNDMVPN address 1.1.19.1
+crypto isakmp key GHNDMVPN address 1.1.19.2
+
+crypto ipsec transform-set DMVPN-SET esp-aes 256 esp-sha-hmac
+ mode transport
+
+crypto ipsec profile DMVPN-PROFILE
+ set transform-set DMVPN-SET
+
+ip route 172.16.0.0 255.255.0.0 Null0
+
+

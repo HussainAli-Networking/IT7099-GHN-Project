@@ -1,0 +1,73 @@
+hostname ISP-R4
+no ip domain lookup
+banner motd ^C
+************************************************************************
+*                                                                      *
+*      SECURITY WARNING: INTERNET SERVICE PROVIDER (ISP) DEVICE        *
+*                                                                      *
+*  NOTICE: This network device Router is the property of the           *
+*  ISP and is restricted to authorized personnel only. Unauthorized    *
+*  access is strictly prohibited and may result in disciplinary action *
+*  and/or legal prosecution.                                           *
+*                                                                      *
+*  This device plays a critical role in network infrastructure and     *
+*  security. Any unauthorized modifications, monitoring, or misuse     *
+*  of this system is strictly forbidden.                               *
+*                                                                      *
+*  All activity is logged and monitored in real-time. Any suspicious   *
+*  activity will be reported to network security teams.                *
+*                                                                      *
+*  If you are not authorized, disconnect immediately.                  *
+*                                                                      *
+************************************************************************
+^C
+int loopback 0
+ip add  1.1.1.4 255.255.255.255
+ no shutdown
+
+int loopback 1
+ip add  40.40.40.40 255.255.255.255
+ no shutdown
+
+int s1/0
+ip add 90.0.0.14 255.255.255.252
+ no shutdown
+
+int s1/1
+ip add 90.0.0.10 255.255.255.252
+ no shutdown
+
+int s1/2
+ip add 90.0.0.45 255.255.255.252
+ no shutdown
+
+router ospf 100
+network 1.1.1.4      0.0.0.0 area 0
+network 90.0.0.12     0.0.0.3 area 0
+network 90.0.0.8     0.0.0.3 area 0
+passive-interface default
+no passive-interface lo0
+no passive-interface s1/0
+no passive-interface s1/1
+  router-id 1.1.1.4
+exit
+
+router bgp 1000
+ bgp router-id 1.1.1.4
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 1.1.1.2 remote-as 1000
+ neighbor 1.1.1.2 update-source Loopback0
+ neighbor 1.1.1.3 remote-as 1000
+ neighbor 1.1.1.3 update-source Loopback0
+ neighbor 90.0.0.46 remote-as 170
+ !
+ address-family ipv4
+  network 40.40.40.40 mask 255.255.255.255
+  network 90.0.0.44 mask 255.255.255.252
+  neighbor 1.1.1.2 activate
+  neighbor 1.1.1.3 activate
+  neighbor 90.0.0.46 activate
+  neighbor 90.0.0.46 next-hop-self
+ exit-address-family
+

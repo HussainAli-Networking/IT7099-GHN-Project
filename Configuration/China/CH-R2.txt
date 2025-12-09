@@ -1,0 +1,205 @@
+hostname CH-R2
+no ip domain lookup
+banner motd ^C
+***********************************************************************
+*                                                                     *
+*  SECURITY WARNING: Global Health Network (GHN) ROUTER             *
+*                                                                     *
+*  NOTICE: This Router is restricted to authorized personnel only.    *
+*  Unauthorized access is strictly prohibited and may lead to         *
+*  disciplinary action or legal prosecution.                          *
+*                                                                     *
+*  This device is monitored to ensure network security and            *
+*  compliance with PSS policies. All activity is logged in real-time. *
+*                                                                     *
+*  If you are not authorized, disconnect immediately.                 * 
+*                                                                     *
+***********************************************************************
+^C
+int loopback 0
+ip add 1.1.19.2 255.255.255.255
+ no shutdown
+
+interface Loopback1
+ ip address 1.1.19.200 255.255.255.255
+no shutdown
+
+interface Tunnel1
+ ip address 100.100.100.7 255.255.255.240
+ no ip redirects
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast 90.0.0.42
+ ip nhrp map 100.100.100.1 90.0.0.42
+ ip nhrp network-id 1
+ ip nhrp nhs 100.100.100.1
+ ip nhrp shortcut
+ delay 1000
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 100
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+
+interface Tunnel2
+ ip address 100.100.200.7 255.255.255.240
+ no ip redirects
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast 1.1.16.2
+ ip nhrp map 100.100.200.1 1.1.16.2
+ ip nhrp network-id 2
+ ip nhrp nhs 100.100.200.1
+ ip nhrp shortcut
+ delay 5000
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 200
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+
+int s1/0
+ ip address 172.20.1.33 255.255.255.252
+ip authentication key-chain eigrp 190 chinaEIGRP
+ no shutdown
+
+int s1/1
+ ip address 90.0.0.34 255.255.255.252
+ no shutdown
+
+int E0/0
+no shutdown
+
+int e0/0.10
+ encapsulation dot1Q 10
+ ip address 172.19.10.2 255.255.255.0
+ standby version 2
+ standby 10 ip 172.19.10.254
+ no shutdown
+
+int e0/0.20
+ encapsulation dot1Q 20
+ ip address 172.19.20.2 255.255.255.0
+ standby version 2
+ standby 20 ip 172.19.20.254
+ no shutdown
+
+int e0/0.30
+ encapsulation dot1Q 30
+ ip address 172.19.30.2 255.255.255.0
+ standby version 2
+ standby 30 ip 172.19.30.254
+ no shutdown
+
+int e0/0.100
+ encapsulation dot1Q 100 native
+ ip address 172.19.100.2 255.255.255.0
+ standby version 2
+ standby 100 ip 172.19.100.254
+ no shutdown
+
+key chain chinaEIGRP
+key 19
+key-string china@eigrp
+cryptographic-algorithm hmac-sha-256
+exit
+exit
+
+router EIGRP 190
+eigrp router-id 1.1.19.2
+network 1.1.19.2       255.255.255.255
+network 172.20.1.32    255.255.255.252
+network 90.0.0.36      255.255.255.252
+network 172.19.10.0    255.255.255.0
+network 172.19.20.0    255.255.255.0
+network 172.19.30.0    255.255.255.0
+network 172.19.100.0   255.255.255.0
+ passive-interface default
+ no passive-interface Loopback0
+ no passive-interface Serial1/0
+ no passive-interface Serial1/1
+
+
+router bgp 190
+bgp router-id 1.1.19.2
+no bgp default ipv4-unicast
+neighbor 90.0.0.33 remote-as 1000
+
+address-family ipv4 unicast
+network 1.1.19.2 mask 255.255.255.255
+neighbor 90.0.0.33 activate
+
+router eigrp DMVPN
+ !
+ address-family ipv4 unicast autonomous-system 100
+  !
+  topology base
+   redistribute static metric 100000 10 255 1 1500
+  exit-af-topology
+  network 1.1.19.200 0.0.0.0
+  network 100.100.100.0 0.0.0.15
+  network 100.100.200.0 0.0.0.15
+  eigrp router-id 1.1.19.200
+ exit-address-family
+
+
+ip domain-name GHN.com
+username CH-R2 privilege 15 algorithm-type scrypt secret chr2@ssh
+
+service password-encryption
+
+crypto key generate rsa modulus 1024
+
+ip ssh version 2
+ip ssh time-out 90
+ip ssh authentication-retries 5
+
+ line vty 0 4
+privilege level 15
+exec-timeout 7 0
+login local
+transport input ssh
+exit
+
+ line console 0
+ exec-timeout 5 0
+ logging synchronous
+
+ line aux 0
+ login local
+ exec-timeout 5 0
+
+crypto isakmp policy 10
+ encr aes 256
+ hash sha256
+ authentication pre-share
+ group 14
+ lifetime 3600
+crypto isakmp key GHNDMVPN address 90.0.0.42
+crypto isakmp key GHNDMVPN address 1.1.16.2
+crypto isakmp key GHNDMVPN address 1.1.17.1
+crypto isakmp key GHNDMVPN address 1.1.17.2
+crypto isakmp key GHNDMVPN address 1.1.18.1
+crypto isakmp key GHNDMVPN address 1.1.18.2
+crypto isakmp key GHNDMVPN address 1.1.19.1
+!
+!
+crypto ipsec transform-set DMVPN-SET esp-aes 256 esp-sha-hmac
+ mode transport
+!
+crypto ipsec profile DMVPN-PROFILE
+ set transform-set DMVPN-SET
+
+ip route 172.19.0.0 255.255.0.0 Null0
+
+
+ip dhcp pool IT
+network 172.19.10.0 255.255.255.0
+ default-router 172.19.10.254
+exit
+
+ip dhcp pool Guests
+network 172.19.20.0 255.255.255.0
+ default-router 172.19.20.254
+exit
+
+
+ip dhcp excluded-address 172.19.10.1 172.19.10.9
+ip dhcp excluded-address 172.19.20.1 172.19.20.19
+
