@@ -14,17 +14,17 @@ Full CLI configurations, backups, and device-specific files for all routers and 
 - Luxembourg
 - China
 - ISP nodes  
-These configs include routing protocols, WAN/VPN setups, security controls, and verification states. :contentReference[oaicite:1]{index=1}
+These configs include routing protocols, WAN/VPN setups, security controls, and verification states. 
 
 ### 2) Design & Documentation Files
-- **Network Topology.png** — Visual map of all GHN sites and connections. :contentReference[oaicite:2]{index=2}
-- Word/Doc notes explaining layout, addressing, and design decisions. :contentReference[oaicite:3]{index=3}
+- **Network Topology.png** — Visual map of all GHN sites and connections. 
+- Word/Doc notes explaining layout, addressing, and design decisions. 
 
 ### 3) Backup Files
-Snapshots of device configs taken at key stages of testing and verification. :contentReference[oaicite:4]{index=4}
+Snapshots of device configs taken at key stages of testing and verification. 
 
 ### 4) System & Server Files
-Supporting materials from the EVE-NG environment and other lab VMs (e.g., Windows Server, RADIUS, server roles). :contentReference[oaicite:5]{index=5}
+Supporting materials from the EVE-NG environment and other lab VMs (e.g., Windows Server, RADIUS, server roles). 
 
 ---
 
@@ -35,7 +35,7 @@ The goal of this project is to demonstrate real-world enterprise routing and mul
 - WAN technologies (DMVPN, eBGP/iBGP)
 - IP addressing and segmentation
 - Network verification and troubleshooting  
-Everything here is practical work you can load into a simulator (like EVE-NG) and verify behavior using CLI commands. :contentReference[oaicite:6]{index=6}
+Everything here is practical work you can load into a simulator (like EVE-NG) and verify behavior using CLI commands. 
 
 ---
 
@@ -50,7 +50,7 @@ Everything here is practical work you can load into a simulator (like EVE-NG) an
    - Connectivity checks
 4. Compare your own setup against the configs in the repo.
 
-This isn’t a plug-and-play “app” — it’s **working lab material** for review, replication, and study. :contentReference[oaicite:7]{index=7}
+This isn’t a plug-and-play “app” — it’s **working lab material** for review, replication, and study. 
 
 ---
 
@@ -64,7 +64,7 @@ This isn’t a plug-and-play “app” — it’s **working lab material** for r
 
 ## Attribution
 
-All work in this repo was done by **Hussain Ali (Student ID: 202202674)** for the IT7099 CCNP route project. :contentReference[oaicite:8]{index=8}
+All work in this repository was completed by Hussain Ali (Student ID: 202202674) as part of the IT7099 CCNP Routing project.
 
 
 
