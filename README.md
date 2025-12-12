@@ -50,14 +50,13 @@ Everything here is practical work you can load into a simulator (like EVE-NG) an
    - Connectivity checks
 4. Compare your own setup against the configs in the repo.
 
-This isn’t a plug-and-play “app” — it’s **working lab material** for review, replication, and study. 
 
 ---
 
 ## Recommended Tools
 
 - **EVE-NG** for topology/simulation
-- Cisco CLI (IOS/IOS-XR/whatever image used)  
+- Cisco CLI (IOL)  
 - Ping, traceroute, and **show/debug** commands for verification
 
 ---
