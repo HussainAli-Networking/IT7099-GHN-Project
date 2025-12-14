@@ -17,8 +17,10 @@ Full CLI configurations, backups, and device-specific files for all routers and 
 These configs include routing protocols, WAN/VPN setups, security controls, and verification states. 
 
 ### 2) Design & Documentation Files
-- **Network Topology.png** — Visual map of all GHN sites and connections. 
-- Word/Doc notes explaining layout, addressing, and design decisions. 
+- **Network Topology**— Visual map of all GHN sites and connections. 
+- Word/Doc notes explaining layout, addressing, and design decisions.
+
+  ![Topology](Network%20Topolgy.png) 
 
 ### 3) Backup Files
 Snapshots of device configs taken at key stages of testing and verification. 
