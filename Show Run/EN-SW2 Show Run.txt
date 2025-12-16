@@ -1,0 +1,143 @@
+!
+! Last configuration change at 11:57:12 UTC Sun Nov 30 2025
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+service compress-config
+!
+hostname EN-SW2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+username EN-SW2 privilege 15 secret 9 $9$SCMbHn4sZozrT7$rt66hZfMfAnviTQaqSeE2hxt5QhuRyhbb4fuSW2Q05g
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+no ip domain-lookup
+ip domain-name GHN.com
+ip cef
+no ipv6 cef
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree portfast edge default
+spanning-tree portfast edge bpduguard default
+spanning-tree portfast edge bpdufilter default
+spanning-tree extend system-id
+spanning-tree vlan 1,10,20,30,100 priority 28672
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Ethernet0/0
+ no shutdown
+ switchport access vlan 10
+ switchport mode access
+ switchport port-security maximum 5
+ switchport port-security mac-address sticky
+ switchport port-security mac-address sticky 0050.7966.6814
+ switchport port-security mac-address sticky 7697.0f33.28f9
+ switchport port-security aging time 120
+ switchport port-security
+ duplex full
+!
+interface Ethernet0/1
+ no shutdown
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 100
+ switchport mode trunk
+ switchport nonegotiate
+ duplex full
+!
+interface Ethernet0/2
+ no shutdown
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 100
+ switchport mode trunk
+ switchport nonegotiate
+ duplex full
+ spanning-tree guard root
+!
+interface Ethernet0/3
+ no shutdown
+ description UNUSED PORT
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface Vlan100
+ no shutdown
+ ip address 172.17.100.102 255.255.255.0
+!
+ip default-gateway 172.17.100.254
+ip forward-protocol nd
+!
+ip http server
+!
+ip ssh time-out 90
+ip ssh authentication-retries 5
+ip ssh version 2
+ip ssh server algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+ip ssh client algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+!
+!
+!
+!
+!
+control-plane
+!
+banner motd C
+***********************************************************************
+*                                                                     *
+*  SECURITY WARNING: GlobalB HealthB Network (GHN) SWITCH             *
+*                                                                     *
+*  NOTICE: This Switch is restricted to authorized personnel only.    *
+*  Unauthorized access is strictly prohibited and may lead to         *
+*  disciplinary action or legal prosecution.                          *
+*                                                                     *
+*  This device is monitored to ensure network security and            *
+*  compliance with GNH policies. All activity is logged in real-time. *
+*                                                                     *
+*  If you are not authorized, disconnect immediately.                 * 
+*                                                                     *
+***********************************************************************
+
+!
+line con 0
+ exec-timeout 5 0
+ logging synchronous
+line aux 0
+ exec-timeout 5 0
+ login local
+line vty 0 4
+ exec-timeout 7 0
+ privilege level 15
+ login local
+ transport input ssh
+!
+!
+!
+end

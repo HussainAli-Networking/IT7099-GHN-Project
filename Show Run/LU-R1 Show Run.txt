@@ -1,0 +1,334 @@
+!
+! Last configuration change at 19:24:44 UTC Mon Dec 8 2025 by lu-r1
+!
+version 15.5
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname LU-R1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 5 $1$ul6g$7UJEw46lxFRx4N3qCvJwA.
+!
+aaa new-model
+!
+!
+aaa authentication login LU-Server group radius local enable
+!
+!
+!
+!
+!
+aaa session-id common
+!
+!
+!
+bsd-client server url https://cloudsso.cisco.com/as/token.oauth2
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+no ip domain lookup
+ip domain name GHN.com
+ip cef
+ipv6 unicast-routing
+ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+key chain luxembourgOSPFv3
+ key 18
+  key-string 7 04571E1E0A2C4E411C0B02371D181C023C78
+  cryptographic-algorithm hmac-sha-256
+!
+!
+!
+!
+!
+cts logging verbose
+!
+!
+username LU-R1 privilege 15 secret 9 $9$5oBW9s2kDyulaX$eC6hb7BIjMPdyBIDKAP93SB0NSAn6grirkpLRjQW/eI
+!
+redundancy
+!
+!
+ip ssh time-out 90
+ip ssh authentication-retries 5
+ip ssh version 2
+! 
+!
+!
+!
+!
+crypto isakmp policy 10
+ encr aes 256
+ hash sha256
+ authentication pre-share
+ group 14
+ lifetime 3600
+crypto isakmp key GHNDMVPN address 90.0.0.42      
+crypto isakmp key GHNDMVPN address 1.1.16.2       
+crypto isakmp key GHNDMVPN address 1.1.17.1       
+crypto isakmp key GHNDMVPN address 1.1.17.2       
+crypto isakmp key GHNDMVPN address 1.1.18.2       
+crypto isakmp key GHNDMVPN address 1.1.19.1       
+crypto isakmp key GHNDMVPN address 1.1.19.2       
+!
+!
+crypto ipsec transform-set DMVPN-SET esp-aes 256 esp-sha-hmac 
+ mode transport
+!
+crypto ipsec profile DMVPN-PROFILE
+ set transform-set DMVPN-SET 
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ no shutdown
+ ip address 1.1.18.1 255.255.255.255
+ ipv6 enable
+ ospfv3 180 ipv4 area 0
+!
+interface Loopback1
+ no shutdown
+ ip address 1.1.18.100 255.255.255.255
+!
+interface Tunnel1
+ no shutdown
+ ip address 100.100.100.3 255.255.255.240
+ no ip redirects
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast 90.0.0.42
+ ip nhrp map 100.100.100.1 90.0.0.42
+ ip nhrp network-id 1
+ ip nhrp nhs 100.100.100.1
+ ip nhrp shortcut
+ delay 1000
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 100
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+!
+interface Tunnel2
+ no shutdown
+ ip address 100.100.200.3 255.255.255.240
+ no ip redirects
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast 1.1.16.2
+ ip nhrp map 100.100.200.1 1.1.16.2
+ ip nhrp network-id 2
+ ip nhrp nhs 100.100.200.1
+ ip nhrp shortcut
+ delay 5000
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 200
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+!
+interface Ethernet0/0
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet0/1
+ no shutdown
+ no ip address
+!
+interface Ethernet0/1.10
+ no shutdown
+ encapsulation dot1Q 10
+ ip address 172.18.10.1 255.255.255.0
+ standby version 2
+ standby 10 ip 172.18.10.254
+ standby 10 priority 150
+ standby 10 preempt
+ ipv6 enable
+ ospfv3 180 ipv4 area 0
+!
+interface Ethernet0/1.20
+ no shutdown
+ encapsulation dot1Q 20
+ ip address 172.18.20.1 255.255.255.0
+ standby version 2
+ standby 20 ip 172.18.20.254
+ standby 20 priority 150
+ standby 20 preempt
+ ipv6 enable
+ ospfv3 180 ipv4 area 0
+!
+interface Ethernet0/1.30
+ no shutdown
+ encapsulation dot1Q 30
+ ip address 172.18.30.1 255.255.255.0
+ standby version 2
+ standby 30 ip 172.18.30.254
+ standby 30 priority 150
+ standby 30 preempt
+ ipv6 enable
+ ospfv3 180 ipv4 area 0
+!
+interface Ethernet0/1.100
+ no shutdown
+ encapsulation dot1Q 100 native
+ ip address 172.18.100.1 255.255.255.0
+ standby version 2
+ standby 100 ip 172.18.100.254
+ standby 100 priority 150
+ standby 100 preempt
+ ipv6 enable
+ ospfv3 180 ipv4 area 0
+!
+interface Ethernet0/2
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet0/3
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Serial1/0
+ no shutdown
+ ip address 172.20.1.30 255.255.255.252
+ ipv6 enable
+ ospfv3 180 ipv4 area 0
+ ospfv3 180 ipv4 authentication key-chain luxembourgOSPFv3
+ serial restart-delay 0
+!
+interface Serial1/1
+ no shutdown
+ no ip address
+ shutdown
+ serial restart-delay 0
+!
+interface Serial1/2
+ no shutdown
+ ip address 90.0.0.30 255.255.255.252
+ serial restart-delay 0
+!
+interface Serial1/3
+ no shutdown
+ no ip address
+ shutdown
+ serial restart-delay 0
+!
+!
+router eigrp DMVPN
+ !
+ address-family ipv4 unicast autonomous-system 100
+  !
+  topology base
+   redistribute static metric 100000 10 255 1 1500
+  exit-af-topology
+  network 1.1.18.100 0.0.0.0
+  network 100.100.100.0 0.0.0.15
+  network 100.100.200.0 0.0.0.15
+  eigrp router-id 1.1.18.100
+ exit-address-family
+!
+router ospfv3 180
+ !
+ address-family ipv4 unicast
+  passive-interface default
+  no passive-interface Serial1/0
+  no passive-interface Loopback0
+  router-id 1.1.18.1
+ exit-address-family
+!
+router bgp 180
+ bgp router-id 1.1.18.1
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 90.0.0.29 remote-as 1000
+ !
+ address-family ipv4
+  network 1.1.18.1 mask 255.255.255.255
+  neighbor 90.0.0.29 activate
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+ip route 172.18.0.0 255.255.0.0 Null0
+!
+!
+!
+!
+!
+radius server LU-Server
+ address ipv4 172.18.30.30 auth-port 1812 acct-port 1813
+ key 7 053C0F01134D4A000C16
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+banner motd C
+***********************************************************************
+*                                                                     *
+*  SECURITY WARNING: GlobalB HealthB Network (GHN) ROUTER             *
+*                                                                     *
+*  NOTICE: This Router is restricted to authorized personnel only.    *
+*  Unauthorized access is strictly prohibited and may lead to         *
+*  disciplinary action or legal prosecution.                          *
+*                                                                     *
+*  This device is monitored to ensure network security and            *
+*  compliance with GHN policies. All activity is logged in real-time. *
+*                                                                     *
+*  If you are not authorized, disconnect immediately.                 * 
+*                                                                     *
+***********************************************************************
+
+!
+line con 0
+ exec-timeout 5 0
+ logging synchronous
+ login authentication LU-Server
+line aux 0
+ exec-timeout 5 0
+line vty 0 4
+ exec-timeout 7 0
+ privilege level 15
+ login authentication LU-Server
+ transport input ssh
+!
+!
+end

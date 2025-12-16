@@ -1,0 +1,261 @@
+!
+! Last configuration change at 19:16:41 UTC Mon Dec 8 2025
+!
+version 15.5
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname BH-R4
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+bsd-client server url https://cloudsso.cisco.com/as/token.oauth2
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+no ip domain lookup
+ip domain name GHN.com
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+key chain BHEIGRP
+ key 16
+  key-string 7 0111070C490A0F010149470E0B15
+  cryptographic-algorithm hmac-sha-256
+!
+!
+!
+!
+!
+cts logging verbose
+!
+!
+username BH-R4 privilege 15 secret 9 $9$FmMPv4BUwNeU3H$jZwLJ9X6oZBIQwUOkKDy4autOFUB.430cKmab6pYGOM
+!
+redundancy
+!
+!
+ip ssh time-out 90
+ip ssh authentication-retries 5
+ip ssh version 2
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ no shutdown
+ ip address 1.1.16.4 255.255.255.255
+!
+interface Ethernet0/0
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet0/1
+ no shutdown
+ no ip address
+!
+interface Ethernet0/1.10
+ no shutdown
+ encapsulation dot1Q 10
+ ip address 172.16.10.2 255.255.255.0
+ standby version 2
+ standby 10 ip 172.16.10.254
+!
+interface Ethernet0/1.20
+ no shutdown
+ encapsulation dot1Q 20
+ ip address 172.16.20.2 255.255.255.0
+ standby version 2
+ standby 20 ip 172.16.20.254
+!
+interface Ethernet0/1.30
+ no shutdown
+ encapsulation dot1Q 30
+ ip address 172.16.30.2 255.255.255.0
+ standby version 2
+ standby 30 ip 172.16.30.254
+!
+interface Ethernet0/1.100
+ no shutdown
+ encapsulation dot1Q 100 native
+ ip address 172.16.100.2 255.255.255.0
+ standby version 2
+ standby 100 ip 172.16.100.254
+!
+interface Ethernet0/2
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet0/3
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Serial1/0
+ no shutdown
+ ip address 172.20.1.14 255.255.255.252
+ serial restart-delay 0
+!
+interface Serial1/1
+ no shutdown
+ ip address 172.20.1.10 255.255.255.252
+ serial restart-delay 0
+!
+interface Serial1/2
+ no shutdown
+ no ip address
+ shutdown
+ serial restart-delay 0
+!
+interface Serial1/3
+ no shutdown
+ no ip address
+ shutdown
+ serial restart-delay 0
+!
+!
+router eigrp BH-EIGRP
+ !
+ address-family ipv4 unicast autonomous-system 160
+  !
+  af-interface default
+   authentication mode hmac-sha-256 7 0790BED3D196
+   authentication key-chain BHEIGRP
+   passive-interface
+  exit-af-interface
+  !
+  af-interface Serial1/0
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface Serial1/1
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface Ethernet0/1.10
+   no authentication mode
+   no authentication key-chain
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface Ethernet0/1.20
+   no authentication mode
+   no authentication key-chain
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface Ethernet0/1.30
+   no authentication mode
+   no authentication key-chain
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface Ethernet0/1.100
+   no authentication mode
+   no authentication key-chain
+   no passive-interface
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+  network 1.1.16.4 0.0.0.0
+  network 172.16.10.0 0.0.0.255
+  network 172.16.20.0 0.0.0.255
+  network 172.16.30.0 0.0.0.255
+  network 172.16.100.0 0.0.0.255
+  network 172.20.1.8 0.0.0.3
+  network 172.20.1.12 0.0.0.3
+  eigrp router-id 1.1.16.4
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+ip route 0.0.0.0 0.0.0.0 172.20.1.9
+!
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+banner motd C
+***********************************************************************
+*                                                                     *
+*  SECURITY WARNING: GlobalB HealthB Network (GHN) ROUTER             *
+*                                                                     *
+*  NOTICE: This Router is restricted to authorized personnel only.    *
+*  Unauthorized access is strictly prohibited and may lead to         *
+*  disciplinary action or legal prosecution.                          *
+*                                                                     *
+*  This device is monitored to ensure network security and            *
+*  compliance with PSS policies. All activity is logged in real-time. *
+*                                                                     *
+*  If you are not authorized, disconnect immediately.                 * 
+*                                                                     *
+***********************************************************************
+
+!
+line con 0
+ exec-timeout 5 0
+ logging synchronous
+line aux 0
+ login local
+line vty 0 4
+ exec-timeout 7 0
+ privilege level 15
+ login local
+ transport input ssh
+!
+!
+end

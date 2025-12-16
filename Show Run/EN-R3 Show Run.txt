@@ -1,0 +1,231 @@
+!
+! Last configuration change at 19:25:30 UTC Mon Dec 8 2025
+!
+version 15.5
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname EN-R3
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+bsd-client server url https://cloudsso.cisco.com/as/token.oauth2
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+no ip domain lookup
+ip domain name GHN.com
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+key chain englandOSPF
+ key 17
+  key-string 7 0949400E150419162B03173A2D
+  cryptographic-algorithm hmac-sha-256
+!
+!
+!
+!
+!
+cts logging verbose
+!
+!
+username EN-R3 privilege 15 secret 9 $9$xrJrozfVIBLmaH$f8tAwhPyju4VzzW9x4USdTaXK/BjrYAsUUPCplziJaI
+!
+redundancy
+!
+!
+ip ssh time-out 90
+ip ssh authentication-retries 5
+ip ssh version 2
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ no shutdown
+ ip address 1.1.17.3 255.255.255.255
+!
+interface Ethernet0/0
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet0/1
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet0/2
+ no shutdown
+ no ip address
+!
+interface Ethernet0/2.10
+ no shutdown
+ encapsulation dot1Q 10
+ ip address 172.17.10.1 255.255.255.0
+ standby version 2
+ standby 10 ip 172.17.10.254
+ standby 10 priority 150
+ standby 10 preempt
+!
+interface Ethernet0/2.20
+ no shutdown
+ encapsulation dot1Q 20
+ ip address 172.17.20.1 255.255.255.0
+ standby version 2
+ standby 20 ip 172.17.20.254
+ standby 20 priority 150
+ standby 20 preempt
+!
+interface Ethernet0/2.30
+ no shutdown
+ encapsulation dot1Q 30
+ ip address 172.17.30.1 255.255.255.0
+ standby version 2
+ standby 30 ip 172.17.30.254
+ standby 30 priority 150
+ standby 30 preempt
+!
+interface Ethernet0/2.100
+ no shutdown
+ encapsulation dot1Q 100 native
+ ip address 172.17.100.1 255.255.255.0
+ standby version 2
+ standby 100 ip 172.17.100.254
+ standby 100 priority 150
+ standby 100 preempt
+!
+interface Ethernet0/3
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Serial1/0
+ no shutdown
+ no ip address
+ serial restart-delay 0
+!
+interface Serial1/1
+ no shutdown
+ ip address 172.20.1.26 255.255.255.252
+ ip ospf authentication key-chain englandOSPF
+ serial restart-delay 0
+!
+interface Serial1/2
+ no shutdown
+ ip address 172.20.1.22 255.255.255.252
+ ip ospf authentication key-chain englandOSPF
+ serial restart-delay 0
+!
+interface Serial1/3
+ no shutdown
+ no ip address
+ shutdown
+ serial restart-delay 0
+!
+router ospf 170
+ router-id 1.1.17.3
+ passive-interface default
+ no passive-interface Serial1/1
+ no passive-interface Serial1/2
+ no passive-interface Loopback0
+ network 1.1.17.3 0.0.0.0 area 0
+ network 172.17.10.0 0.0.0.255 area 0
+ network 172.17.20.0 0.0.0.255 area 0
+ network 172.17.30.0 0.0.0.255 area 0
+ network 172.17.100.0 0.0.0.255 area 0
+ network 172.20.1.20 0.0.0.3 area 0
+ network 172.20.1.24 0.0.0.3 area 0
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+banner motd C
+***********************************************************************
+*                                                                     *
+*  SECURITY WARNING: GlobalB HealthB Network (GHN) ROUTER             *
+*                                                                     *
+*  NOTICE: This Router is restricted to authorized personnel only.    *
+*  Unauthorized access is strictly prohibited and may lead to         *
+*  disciplinary action or legal prosecution.                          *
+*                                                                     *
+*  This device is monitored to ensure network security and            *
+*  compliance with GHN policies. All activity is logged in real-time. *
+*                                                                     *
+*  If you are not authorized, disconnect immediately.                 * 
+*                                                                     *
+***********************************************************************
+
+!
+line con 0
+ exec-timeout 5 0
+ logging synchronous
+line aux 0
+ exec-timeout 5 0
+ login local
+line vty 0 4
+ exec-timeout 7 0
+ privilege level 15
+ login local
+ transport input ssh
+!
+!
+end
+
+    

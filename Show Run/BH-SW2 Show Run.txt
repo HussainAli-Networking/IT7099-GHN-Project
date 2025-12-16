@@ -1,0 +1,167 @@
+!
+! Last configuration change at 11:58:05 UTC Sun Nov 30 2025
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+service compress-config
+!
+hostname BH-SW2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+username BH-SW2 privilege 15 secret 9 $9$1SF8y83b89E4yN$7cgf7IYw61lCvlGnFSCXSUfy6K9SQlLBG58naTPg/jc
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+no ip domain-lookup
+ip domain-name GHN.com
+ip cef
+no ipv6 cef
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree loopguard default
+spanning-tree portfast edge default
+spanning-tree portfast edge bpduguard default
+spanning-tree portfast edge bpdufilter default
+spanning-tree extend system-id
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Ethernet0/0
+ no shutdown
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 100
+ switchport mode trunk
+ switchport nonegotiate
+ duplex full
+!
+interface Ethernet0/1
+ no shutdown
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 100
+ switchport mode trunk
+ switchport nonegotiate
+ duplex full
+!
+interface Ethernet0/2
+ no shutdown
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 100
+ switchport mode trunk
+ switchport nonegotiate
+ duplex full
+!
+interface Ethernet0/3
+ no shutdown
+ description UNUSED PORT
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface Ethernet1/0
+ no shutdown
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 100
+ switchport mode trunk
+ switchport nonegotiate
+ duplex full
+!
+interface Ethernet1/1
+ no shutdown
+ switchport access vlan 30
+ switchport mode access
+ switchport port-security maximum 5
+ switchport port-security mac-address sticky
+ switchport port-security mac-address sticky 5000.0024.0000
+ switchport port-security mac-address sticky 8a8c.85f4.f9dc
+ switchport port-security mac-address sticky ee2b.9ac9.95d0
+ switchport port-security mac-address sticky fad3.6439.b0db
+ switchport port-security aging time 120
+ switchport port-security
+!
+interface Ethernet1/2
+ no shutdown
+ description UNUSED PORT
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface Ethernet1/3
+ no shutdown
+ description UNUSED PORT
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface Vlan100
+ no shutdown
+ ip address 172.16.100.102 255.255.255.0
+!
+ip default-gateway 172.16.100.254
+ip forward-protocol nd
+!
+ip http server
+!
+ip ssh time-out 90
+ip ssh authentication-retries 5
+ip ssh version 2
+ip ssh server algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+ip ssh client algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+!
+!
+!
+!
+!
+control-plane
+!
+banner motd C
+***********************************************************************
+*                                                                     *
+*  SECURITY WARNING: GlobalB HealthB Network (GHN) SWITCH             *
+*                                                                     *
+*  NOTICE: This Switch is restricted to authorized personnel only.    *
+*  Unauthorized access is strictly prohibited and may lead to         *
+*  disciplinary action or legal prosecution.                          *
+*                                                                     *
+*  This device is monitored to ensure network security and            *
+*  compliance with PSS policies. All activity is logged in real-time. *
+*                                                                     *
+*  If you are not authorized, disconnect immediately.                 * 
+*                                                                     *
+***********************************************************************
+
+!
+line con 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ login
+!
+!
+!
+end

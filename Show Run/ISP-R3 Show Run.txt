@@ -1,0 +1,205 @@
+!
+version 15.5
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname ISP-R3
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+bsd-client server url https://cloudsso.cisco.com/as/token.oauth2
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+cts logging verbose
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ no shutdown
+ ip address 1.1.1.3 255.255.255.255
+!
+interface Loopback1
+ no shutdown
+ ip address 30.30.30.30 255.255.255.255
+!
+interface Ethernet0/0
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet0/1
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet0/2
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet0/3
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Serial1/0
+ no shutdown
+ ip address 90.0.0.13 255.255.255.252
+ serial restart-delay 0
+!
+interface Serial1/1
+ no shutdown
+ ip address 90.0.0.6 255.255.255.252
+ serial restart-delay 0
+!
+interface Serial1/2
+ no shutdown
+ ip address 90.0.0.41 255.255.255.252
+ serial restart-delay 0
+!
+interface Serial1/3
+ no shutdown
+ no ip address
+ shutdown
+ serial restart-delay 0
+!
+router ospf 100
+ router-id 1.1.1.3
+ passive-interface default
+ no passive-interface Serial1/0
+ no passive-interface Serial1/1
+ no passive-interface Loopback0
+ network 1.1.1.3 0.0.0.0 area 0
+ network 90.0.0.4 0.0.0.3 area 0
+ network 90.0.0.12 0.0.0.3 area 0
+!
+router bgp 1000
+ bgp router-id 1.1.1.3
+ bgp cluster-id 1.1.1.2
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 1.1.1.1 remote-as 1000
+ neighbor 1.1.1.1 update-source Loopback0
+ neighbor 1.1.1.2 remote-as 1000
+ neighbor 1.1.1.2 update-source Loopback0
+ neighbor 1.1.1.4 remote-as 1000
+ neighbor 1.1.1.4 update-source Loopback0
+ neighbor 90.0.0.42 remote-as 160
+ !
+ address-family ipv4
+  network 30.30.30.30 mask 255.255.255.255
+  network 90.0.0.40 mask 255.255.255.252
+  neighbor 1.1.1.1 activate
+  neighbor 1.1.1.1 route-reflector-client
+  neighbor 1.1.1.2 activate
+  neighbor 1.1.1.4 activate
+  neighbor 1.1.1.4 route-reflector-client
+  neighbor 90.0.0.42 activate
+  neighbor 90.0.0.42 next-hop-self
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+banner motd C
+************************************************************************
+*                                                                      *
+*      SECURITY WARNING: INTERNET SERVICE PROVIDER (ISP) DEVICE        *
+*                                                                      *
+*  NOTICE: This network device Router is the property of the           *
+*  ISP and is restricted to authorized personnel only. Unauthorized    *
+*  access is strictly prohibited and may result in disciplinary action *
+*  and/or legal prosecution.                                           *
+*                                                                      *
+*  This device plays a critical role in network infrastructure and     *
+*  security. Any unauthorized modifications, monitoring, or misuse     *
+*  of this system is strictly forbidden.                               *
+*                                                                      *
+*  All activity is logged and monitored in real-time. Any suspicious   *
+*  activity will be reported to network security teams.                *
+*                                                                      *
+*  If you are not authorized, disconnect immediately.                  *
+*                                                                      *
+************************************************************************
+
+!
+line con 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ login
+ transport input none
+!
+!
+end

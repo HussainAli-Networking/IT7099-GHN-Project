@@ -1,0 +1,275 @@
+!
+version 15.5
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname BH-R2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+bsd-client server url https://cloudsso.cisco.com/as/token.oauth2
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+no ip domain lookup
+ip domain name GHN.com
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+key chain BHEIGRP
+ key 16
+  key-string 7 070D20445C08100B3717020B163A
+  cryptographic-algorithm hmac-sha-256
+!
+!
+!
+!
+!
+cts logging verbose
+!
+!
+username BH-R2 privilege 15 secret 9 $9$MpBZY48rQQXC6H$wxnu8thehoAExLSqBvYO9QMbULfjksKXI1J4kRZXJ6E
+!
+redundancy
+!
+!
+ip ssh time-out 90
+ip ssh authentication-retries 5
+ip ssh version 2
+! 
+!
+!
+!
+!
+crypto isakmp policy 10
+ encr aes 256
+ hash sha256
+ authentication pre-share
+ group 14
+ lifetime 3600
+crypto isakmp key GHNDMVPN address 1.1.17.1       
+crypto isakmp key GHNDMVPN address 1.1.17.2       
+crypto isakmp key GHNDMVPN address 1.1.18.1       
+crypto isakmp key GHNDMVPN address 1.1.18.2       
+crypto isakmp key GHNDMVPN address 1.1.19.1       
+crypto isakmp key GHNDMVPN address 1.1.19.2       
+!
+!
+crypto ipsec transform-set DMVPN-SET esp-aes 256 esp-sha-hmac 
+ mode transport
+!
+crypto ipsec profile DMVPN-PROFILE
+ set transform-set DMVPN-SET 
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ no shutdown
+ ip address 1.1.16.2 255.255.255.255
+!
+interface Loopback1
+ no shutdown
+ ip address 1.1.16.200 255.255.255.255
+!
+interface Tunnel2
+ no shutdown
+ ip address 100.100.200.1 255.255.255.240
+ no ip redirects
+ ip nhrp authentication GHNDMVPN
+ ip nhrp map multicast dynamic
+ ip nhrp network-id 2
+ ip nhrp redirect
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 200
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+!
+interface Ethernet0/0
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet0/1
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet0/2
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet0/3
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Serial1/0
+ no shutdown
+ ip address 172.20.1.2 255.255.255.252
+ serial restart-delay 0
+!
+interface Serial1/1
+ no shutdown
+ ip address 172.20.1.9 255.255.255.252
+ serial restart-delay 0
+!
+interface Serial1/2
+ no shutdown
+ ip address 90.0.0.18 255.255.255.252
+ serial restart-delay 0
+!
+interface Serial1/3
+ no shutdown
+ no ip address
+ shutdown
+ serial restart-delay 0
+!
+!
+router eigrp BH-EIGRP
+ !
+ address-family ipv4 unicast autonomous-system 160
+  !
+  af-interface default
+   authentication mode hmac-sha-256 7 009B8C999BC4
+   authentication key-chain BHEIGRP
+   passive-interface
+  exit-af-interface
+  !
+  af-interface Serial1/0
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface Serial1/1
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface Serial1/2
+   no authentication mode
+   no authentication key-chain
+   no passive-interface
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+  network 1.1.16.2 0.0.0.0
+  network 90.0.0.44 0.0.0.3
+  network 172.20.1.0 0.0.0.3
+  network 172.20.1.8 0.0.0.3
+  eigrp router-id 1.1.16.2
+ exit-address-family
+!
+!
+router eigrp DMVPN
+ !
+ address-family ipv4 unicast autonomous-system 100
+  !
+  af-interface Tunnel2
+   no next-hop-self
+   no split-horizon
+  exit-af-interface
+  !
+  topology base
+   redistribute static metric 100000 10 255 1 1500
+  exit-af-topology
+  network 1.1.16.200 0.0.0.0
+  network 100.100.200.0 0.0.0.15
+  eigrp router-id 1.1.16.200
+ exit-address-family
+!
+router bgp 160
+ bgp router-id 1.1.16.2
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 90.0.0.17 remote-as 1000
+ !
+ address-family ipv4
+  network 1.1.16.2 mask 255.255.255.255
+  neighbor 90.0.0.17 activate
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+ip route 172.16.0.0 255.255.0.0 Null0
+!
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+banner motd C
+***********************************************************************
+*                                                                     *
+*  SECURITY WARNING: GlobalB HealthB Network (GHN) ROUTER             *
+*                                                                     *
+*  NOTICE: This Router is restricted to authorized personnel only.    *
+*  Unauthorized access is strictly prohibited and may lead to         *
+*  disciplinary action or legal prosecution.                          *
+*                                                                     *
+*  This device is monitored to ensure network security and            *
+*  compliance with PSS policies. All activity is logged in real-time. *
+*                                                                     *
+*  If you are not authorized, disconnect immediately.                 * 
+*                                                                     *
+***********************************************************************
+
+!
+line con 0
+ exec-timeout 5 0
+ logging synchronous
+line aux 0
+ exec-timeout 5 0
+ login local
+line vty 0 4
+ exec-timeout 7 0
+ privilege level 15
+ login local
+ transport input ssh
+!
+!
+end
