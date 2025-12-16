@@ -1,11 +1,11 @@
 # IT7099 — Global Health Network (GHN) Project
 
-This repository contains all working files, configurations, and documentation used throughout the **IT7099 CCNP Routing project**, titled the *Global Health Network (GHN) Project*.  
+This Repository sitory contains all working files, configurations, and documentation used throughout the **IT7099 CCNP Routing project**, titled the *Global Health Network (GHN) Project*.  
 Everything here is meant to document the design, implementation, verification, and backups for a real multi-site enterprise network built and tested in a lab environment. :contentReference[oaicite:0]{index=0}
 
 ---
 
-## What’s in This Repo
+## What’s in This Repository 
 
 ### 1) Network Configurations  
 Full CLI configurations, backups, and device-specific files for all routers and switches across GHN sites:
@@ -41,7 +41,7 @@ Everything here is practical work you can load into a simulator (like EVE-NG) an
 
 ---
 
-## How to Use This Repo
+## How to Use This Repository 
 
 **If you’re studying or reviewing this project:**
 1. Open the **Network Topology** diagram to understand site layout.
@@ -50,7 +50,7 @@ Everything here is practical work you can load into a simulator (like EVE-NG) an
    - Routing
    - Security
    - Connectivity checks
-4. Compare your own setup against the configs in the repo.
+4. Compare your own setup against the configs in the Repository .
 
 
 ---
@@ -65,7 +65,7 @@ Everything here is practical work you can load into a simulator (like EVE-NG) an
 
 ## Attribution
 
-All work in this repository was completed by Hussain Ali (Student ID: 202202674) as part of the IT7099 CCNP Routing project.
+All work in this Repository sitory was completed by Hussain Ali (Student ID: 202202674) as part of the IT7099 CCNP Routing project.
 
 
 
