@@ -1,7 +1,7 @@
 # IT7099 — Global Health Network (GHN) Project
 
 This Repository sitory contains all working files, configurations, and documentation used throughout the **IT7099 CCNP Routing project**, titled the *Global Health Network (GHN) Project*.  
-Everything here is meant to document the design, implementation, verification, and backups for a real multi-site enterprise network built and tested in a lab environment. :contentReference[oaicite:0]{index=0}
+Everything here is meant to document the design, implementation, verification, and backups for a real multi-site enterprise network built and tested in a lab environment. 
 
 ---
 
