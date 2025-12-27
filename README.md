@@ -65,7 +65,7 @@ Everything here is practical work you can load into a simulator (like EVE-NG) an
 
 ## Attribution
 
-All work in this Repository sitory was completed by Hussain Ali (Student ID: 202202674) as part of the IT7099 CCNP Routing project.
+All work in this Repository was completed by Hussain Ali (Student ID: 202202674) as part of the IT7099 CCNP Route For A Global Health Network project.
 
 
 
