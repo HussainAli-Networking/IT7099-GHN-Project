@@ -20,7 +20,7 @@ These configs include routing protocols, WAN/VPN setups, security controls, and 
 - **Network Topology**— Visual map of all GHN sites and connections. 
 - Word/Doc notes explaining layout, addressing, and design decisions.
 
-  ![Topology](Network%20Topolgy.png) 
+  ![Topology](Network%Topology.png) 
 
 ### 3) Backup Files
 Snapshots of device configs taken at key stages of testing and verification. 
